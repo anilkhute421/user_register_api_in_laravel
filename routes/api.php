@@ -19,6 +19,6 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::post('v1/signup_manually', [userController::class,'signup_manually']);
-Route::post('v1/user_address', [userController::class, 'user_address']);
+Route::get('v1/user_details', [userController::class, 'user_details']);
 
 

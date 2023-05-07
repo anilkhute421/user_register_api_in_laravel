@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\ApiBaseController;
 use App\Http\Requests\UserRequest;
 use App\Models\Address;
-use App\Models\User;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,22 +17,35 @@ class userController extends ApiBaseController
 
         \Log::info($request->getContent());
 
-        try {
-            $validator = validator($request->all(), UserRequest::signup_manually_user());
+        // try {
+            // $validator = validator($request->all(), UserRequest::signup_manually_user());
 
-            if ($validator->fails()) {
-                return $this->sendSingleFieldError($validator->errors()->first(), 201, 200);
-            }
+            // if ($validator->fails()) {
+            //     return $this->sendSingleFieldError($validator->errors()->first(), 201, 200);
+            // }
 
-            $user = User::create(['email' => $request->email,
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'date_of_birth' => $request->date_of_birth,
-                'phone_number' => $request->phone_number,
-                'ip_address' => $request->ip_address,
-                'browser' => $request->browser,
-                'device_type' => $request->device_type,
-                'User_type' => $request->User_type]);
+            $user = Employee::create(['email' => $request->email ? $request->email : 'null',
+                'name' => $request->name,
+                'age' => $request->age,
+                'gender' => $request->sex,
+                'phone_number' => $request->mobile,
+                'govid' => $request->idType ? $request->idType : 'null',
+                'idno' => $request->govId ? $request->govId : 'null',
+                'gardian' => $request->contactType ? $request->contactType : 'null',
+                'gardian_name' => $request->guardianName ? $request->guardianName : 'null',
+                'address' => $request->address ? $request->address : 'null',
+                'country' => $request->country  ? $request->country : 'null',
+                'state' => $request->state ? $request->state : 'null',
+                'city' => $request->city ? $request->city : 'null',
+                'pincode' => $request->pincode ? $request->pincode : 'null',
+                'occuppation' => $request->occuppation ? $request->occuppation : 'null',
+                'Religion' => $request->religion ? $request->religion : 'null',
+                'marital_status' => $request->maritalStatus ? $request->maritalStatus : 'null',
+                'bood_group' => $request->bloodGroup ? $request->bloodGroup : 'null',
+                'nationality' => $request->nationality ? $request->nationality : 'null',
+                'occuppation' => $request->occupation ? $request->occupation : 'null',
+                'emergency_con' => $request->emergencyContact ? $request->emergencyContact : 'null'    
+               ]);
 
             if ($user) {
                 return $this->sendResponse($user, 'Registration Successful', 200, 200);
@@ -40,25 +53,24 @@ class userController extends ApiBaseController
                 return $this->sendSingleFieldError('somthing_went_wrong', 201, 200);
             }
 
-        } catch (\Throwable $th) {
+        // } catch (\Throwable $th) {
 
-            return $this->sendSingleFieldError('There is some error in this api', 201, 200);
-        }
+        //     return $this->sendSingleFieldError('There is some error in this api', 201, 200);
+        // }
 
     }
 
-    public function user_address(Request $request)
+    public function user_details(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
-        foreach ($data as $item) {
-            $address = Address::create([
-                'line1' => $item['line1'],
-                'line2' => $item['line2'],
-                'line3' => $item['line3'],
-            ]);
-        }
-        if ($address) {
-            return $this->sendResponse($address, 'address Successful saved', 200, 200);
+        $data = Employee::get();
+
+        $data = $data->map(function ($employee) {
+            $employee->agegender = $employee->age .'/'. $employee->gender;
+            return $employee;
+        });
+        
+        if ($data) {
+            return $this->sendResponse($data, 'address Successful saved', 200, 200);
         } else {
             return $this->sendSingleFieldError('somthing_went_wrong', 201, 200);
         }
